@@ -34,14 +34,14 @@ export interface ExecutionResult {
   executionTime: number;
 }
 
-const API_URL = 'http://localhost:8000';
+const API_URL = '';
 
 export const api = {
   /**
    * Create a new interview session
    */
   async createSession(hostName: string, language: string = 'javascript'): Promise<Session> {
-    const response = await fetch(`${API_URL}/sessions`, {
+    const response = await fetch(`${API_URL}/api/sessions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ hostName, language }),
@@ -58,7 +58,7 @@ export const api = {
    * Join an existing session
    */
   async joinSession(sessionId: string, participantName: string): Promise<Session | null> {
-    const response = await fetch(`${API_URL}/sessions/${sessionId}/join`, {
+    const response = await fetch(`${API_URL}/api/sessions/${sessionId}/join`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ participantName }),
@@ -76,7 +76,7 @@ export const api = {
    * Get session by ID
    */
   async getSession(sessionId: string): Promise<Session | null> {
-    const response = await fetch(`${API_URL}/sessions/${sessionId}`);
+    const response = await fetch(`${API_URL}/api/sessions/${sessionId}`);
 
     if (!response.ok) {
       if (response.status === 404) return null;
@@ -90,7 +90,7 @@ export const api = {
    * Update code in session
    */
   async updateCode(update: CodeUpdate): Promise<void> {
-    const response = await fetch(`${API_URL}/sessions/${update.sessionId}/code`, {
+    const response = await fetch(`${API_URL}/api/sessions/${update.sessionId}/code`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(update),

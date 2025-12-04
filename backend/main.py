@@ -33,8 +33,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(sessions.router)
-app.include_router(execution.router)
+app.include_router(sessions.router, prefix="/api")
+app.include_router(execution.router, prefix="/api")
 
 @app.get("/api")
 async def root():

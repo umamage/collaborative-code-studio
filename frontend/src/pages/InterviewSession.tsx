@@ -16,18 +16,27 @@ export default function InterviewSession() {
   const [session, setSession] = useState<Session | null>(null);
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('javascript');
+  const [input, setInput] = useState('');
   const [result, setResult] = useState<ExecutionResult | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // ... (existing useEffects)
 
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage);
+  };
+
+  const handleCodeChange = (newCode: string) => {
+    setCode(newCode);
+  };
+
   const handleRun = async () => {
     setIsExecuting(true);
     setResult(null);
     try {
       // Use client-side executor
-      const execResult = await executor.executeCode(code, language);
+      const execResult = await executor.executeCode(code, language, input);
       setResult(execResult);
     } catch (error) {
       toast.error('Execution failed');
@@ -100,7 +109,12 @@ export default function InterviewSession() {
 
         {/* Output Panel */}
         <div className="w-96 p-4 pl-0">
-          <OutputPanel result={result} isExecuting={isExecuting} />
+          <OutputPanel
+            result={result}
+            isExecuting={isExecuting}
+            input={input}
+            onInputChange={setInput}
+          />
         </div>
       </div>
     </div>

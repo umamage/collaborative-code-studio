@@ -10,7 +10,7 @@ declare global {
 let pyodide: any = null;
 
 export const executor = {
-    async executeCode(code: string, language: string): Promise<ExecutionResult> {
+    async executeCode(code: string, language: string, input: string = ''): Promise<ExecutionResult> {
         const startTime = performance.now();
 
         try {
@@ -19,7 +19,7 @@ export const executor = {
             if (language === 'javascript') {
                 output = await executeJavaScript(code);
             } else if (language === 'python') {
-                output = await executePython(code);
+                output = await executePython(code, input);
             } else {
                 return {
                     success: false,
@@ -96,7 +96,7 @@ function executeJavaScript(code: string): Promise<string> {
     });
 }
 
-async function executePython(code: string): Promise<string> {
+async function executePython(code: string, input: string): Promise<string> {
     if (!pyodide) {
         if (!window.loadPyodide) {
             throw new Error('Pyodide is not loaded. Please refresh the page.');
@@ -109,10 +109,17 @@ async function executePython(code: string): Promise<string> {
 
     try {
         // We use a custom capture method because setStdout is tricky with async
+        // Also mock stdin with the provided input
         await pyodide.runPythonAsync(`
 import sys
 from io import StringIO
+
+class MockStdin(StringIO):
+    def readline(self, size=-1):
+        return super().readline(size)
+
 sys.stdout = StringIO()
+sys.stdin = MockStdin('${input.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')
 `);
 
         await pyodide.runPythonAsync(code);
