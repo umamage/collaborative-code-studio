@@ -1,12 +1,12 @@
 from fastapi.testclient import TestClient
 import sys
 import os
+import pytest
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from main import app
 
-client = TestClient(app)
-
-def test_collaboration_scenario():
+def test_collaboration_scenario(client):
     # 1. Host creates a session
     host_response = client.post("/sessions", json={"hostName": "HostUser", "language": "python"})
     assert host_response.status_code == 201

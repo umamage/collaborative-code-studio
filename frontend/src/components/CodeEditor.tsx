@@ -8,20 +8,16 @@ interface CodeEditorProps {
   readOnly?: boolean;
 }
 
-const languageMap: Record<string, string> = {
-  javascript: 'javascript',
-  typescript: 'typescript',
-  python: 'python',
-  java: 'java',
-  cpp: 'cpp',
-};
+// Monaco Editor language IDs match our internal IDs for these languages
+// Supported: javascript, typescript, python, java, cpp
+
 
 export function CodeEditor({ value, language, onChange, readOnly = false }: CodeEditorProps) {
   return (
     <div className="h-full w-full rounded-lg overflow-hidden border border-border bg-editor">
       <Editor
         height="100%"
-        language={languageMap[language] || 'javascript'}
+        language={language}
         value={value}
         onChange={(val) => onChange(val || '')}
         theme="vs-dark"

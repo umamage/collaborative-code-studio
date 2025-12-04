@@ -101,22 +101,7 @@ export const api = {
     }
   },
 
-  /**
-   * Execute code safely
-   */
-  async executeCode(code: string, language: string): Promise<ExecutionResult> {
-    const response = await fetch(`${API_URL}/execute`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, language }),
-    });
 
-    if (!response.ok) {
-      throw new Error('Failed to execute code');
-    }
-
-    return response.json();
-  },
 
   /**
    * Subscribe to real-time updates (polling for now)
