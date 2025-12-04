@@ -1,0 +1,216 @@
+openapi: 3.0.0
+info:
+  title: Collaborative Code Studio API
+  description: API for the Collaborative Code Studio backend, supporting real-time collaboration and code execution.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+
+paths:
+  /sessions:
+    post:
+      summary: Create a new interview session
+      operationId: createSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - hostName
+              properties:
+                hostName:
+                  type: string
+                  description: Name of the host creating the session
+                language:
+                  type: string
+                  default: javascript
+                  description: Initial programming language
+      responses:
+        '201':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          description: Invalid input
+
+  /sessions/{sessionId}:
+    get:
+      summary: Get session details by ID
+      operationId: getSession
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '404':
+          description: Session not found
+
+  /sessions/{sessionId}/join:
+    post:
+      summary: Join an existing session
+      operationId: joinSession
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - participantName
+              properties:
+                participantName:
+                  type: string
+      responses:
+        '200':
+          description: Joined session successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '404':
+          description: Session not found
+
+  /sessions/{sessionId}/code:
+    put:
+      summary: Update code in a session
+      operationId: updateCode
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodeUpdate'
+      responses:
+        '200':
+          description: Code updated successfully
+        '404':
+          description: Session not found
+
+  /execute:
+    post:
+      summary: Execute code safely
+      operationId: executeCode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - language
+              properties:
+                code:
+                  type: string
+                language:
+                  type: string
+      responses:
+        '200':
+          description: Execution result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionResult'
+        '500':
+          description: Execution failed
+
+components:
+  schemas:
+    Session:
+      type: object
+      required:
+        - id
+        - createdAt
+        - language
+        - code
+        - participants
+      properties:
+        id:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        language:
+          type: string
+        code:
+          type: string
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/Participant'
+
+    Participant:
+      type: object
+      required:
+        - id
+        - name
+        - isHost
+        - joinedAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        isHost:
+          type: boolean
+        joinedAt:
+          type: string
+          format: date-time
+
+    CodeUpdate:
+      type: object
+      required:
+        - sessionId
+        - code
+        - language
+        - updatedBy
+      properties:
+        sessionId:
+          type: string
+        code:
+          type: string
+        language:
+          type: string
+        updatedBy:
+          type: string
+
+    ExecutionResult:
+      type: object
+      required:
+        - success
+        - output
+        - executionTime
+      properties:
+        success:
+          type: boolean
+        output:
+          type: string
+        error:
+          type: string
+        executionTime:
+          type: number
