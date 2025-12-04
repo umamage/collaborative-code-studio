@@ -39,6 +39,8 @@ COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
 # Expose port
 EXPOSE 8000
 
+RUN apt-get update && apt-get install -y libpq-dev
+
 # Set environment variables
 ENV DATABASE_URL=sqlite+aiosqlite:///./data/app.db
 ENV PYTHONUNBUFFERED=1
