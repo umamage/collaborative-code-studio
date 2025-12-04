@@ -2,7 +2,12 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 import os
 
 # Default to SQLite for local development, but allow overriding for PostgreSQL
+# For PostgreSQL, use postgresql+psycopg:// (async driver)
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
+
+# Render provides postgres:// URLs, but we need postgresql+psycopg://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
 
 engine = create_async_engine(
     DATABASE_URL,
