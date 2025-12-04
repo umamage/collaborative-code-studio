@@ -61,6 +61,23 @@ docker run -p 8000:8000 -v app-data:/app/data collaborative-code-studio
 
 The Docker container includes both frontend and backend in a single image.
 
+### Render Deployment
+
+Deploy to Render with one click using the Blueprint:
+
+```bash
+# Push your code to GitHub
+git push origin main
+```
+
+Then follow the [Render Deployment Guide](DEPLOY_RENDER.md) for detailed instructions.
+
+Alternatively, use the Render button:
+- Go to [Render Dashboard](https://dashboard.render.com)
+- New → Blueprint
+- Connect your GitHub repository
+- Render auto-detects `render.yaml` and deploys
+
 ## Backend
 
 The backend is built with FastAPI and uses `uv` for dependency management.
