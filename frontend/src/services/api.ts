@@ -122,7 +122,7 @@ export const api = {
   },
 };
 
-function getDefaultCode(language: string): string {
+export function getDefaultCode(language: string): string {
   const templates: Record<string, string> = {
     javascript: `// Welcome to the coding interview!
 // Write your solution below.

@@ -7,7 +7,7 @@ import { LanguageSelector } from '@/components/LanguageSelector';
 import { OutputPanel } from '@/components/OutputPanel';
 import { ShareDialog } from '@/components/ShareDialog';
 import { Button } from '@/components/ui/button';
-import { api, SUPPORTED_LANGUAGES, type Session, type ExecutionResult } from '@/services/api';
+import { api, SUPPORTED_LANGUAGES, getDefaultCode, type Session, type ExecutionResult } from '@/services/api';
 import { executor } from '@/services/executor';
 import { toast } from 'sonner';
 
@@ -21,14 +21,87 @@ export default function InterviewSession() {
   const [isExecuting, setIsExecuting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // ... (existing useEffects)
+  // In development, redirect to frontend dev server if accessing backend port
+  useEffect(() => {
+    const currentPort = window.location.port;
+    const currentHost = window.location.hostname;
+
+    // If accessing backend port (8000) in development, redirect to frontend (8080)
+    if (currentPort === '8000' && (currentHost === 'localhost' || currentHost === '127.0.0.1')) {
+      const frontendUrl = `http://localhost:8080${window.location.pathname}${window.location.search}`;
+      window.location.href = frontendUrl;
+      return;
+    }
+  }, []);
+
+
+  // Load session on mount
+  useEffect(() => {
+    if (!sessionId) {
+      setIsLoading(false);
+      return;
+    }
+
+    const loadSession = async () => {
+      try {
+        const sessionData = await api.getSession(sessionId);
+        if (sessionData) {
+          setSession(sessionData);
+          setCode(sessionData.code);
+          setLanguage(sessionData.language);
+        } else {
+          toast.error('Session not found');
+        }
+      } catch (error) {
+        toast.error('Failed to load session');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSession();
+  }, [sessionId]);
+
+  // Subscribe to session updates
+  useEffect(() => {
+    if (!sessionId) return;
+
+    const unsubscribe = api.subscribeToSession(sessionId, (updatedSession) => {
+      setSession(updatedSession);
+      setCode(updatedSession.code);
+      setLanguage(updatedSession.language);
+    });
+
+    return unsubscribe;
+  }, [sessionId]);
+
+  // Update code on server when it changes
+  const updateCode = useCallback(async (newCode: string, newLanguage: string) => {
+    if (!sessionId) return;
+
+    try {
+      await api.updateCode({
+        sessionId,
+        code: newCode,
+        language: newLanguage,
+        updatedBy: session?.participants[0]?.name || 'Unknown',
+      });
+    } catch (error) {
+      console.error('Failed to update code:', error);
+    }
+  }, [sessionId, session]);
+
 
   const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage);
+    const defaultCode = getDefaultCode(newLanguage);
+    setCode(defaultCode);
+    updateCode(defaultCode, newLanguage);
   };
 
   const handleCodeChange = (newCode: string) => {
     setCode(newCode);
+    updateCode(newCode, language);
   };
 
   const handleRun = async () => {

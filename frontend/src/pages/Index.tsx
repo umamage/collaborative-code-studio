@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Code2, ArrowRight, Users, Zap, Shield, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,12 +13,24 @@ const Index = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
 
+  // In development, redirect to frontend dev server if accessing backend port
+  useEffect(() => {
+    const currentPort = window.location.port;
+    const currentHost = window.location.hostname;
+
+    // If accessing backend port (8000) in development, redirect to frontend (8080)
+    if (currentPort === '8000' && (currentHost === 'localhost' || currentHost === '127.0.0.1')) {
+      const frontendUrl = `http://localhost:8080${window.location.pathname}${window.location.search}`;
+      window.location.href = frontendUrl;
+    }
+  }, []);
+
   const handleCreate = async () => {
     if (!name.trim()) {
       toast.error('Please enter your name');
       return;
     }
-    
+
     setIsCreating(true);
     try {
       const session = await api.createSession(name.trim());
@@ -40,7 +52,7 @@ const Index = () => {
       toast.error('Please enter a session code');
       return;
     }
-    
+
     setIsJoining(true);
     try {
       const session = await api.joinSession(joinCode.trim(), name.trim());
@@ -78,14 +90,14 @@ const Index = () => {
             <Sparkles className="w-4 h-4" />
             Real-time collaborative coding
           </div>
-          
+
           <h1 className="text-5xl md:text-6xl font-bold text-foreground leading-tight">
             Technical interviews,{' '}
             <span className="gradient-text">reimagined</span>
           </h1>
-          
+
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Create instant coding sessions, share with candidates, and collaborate in real-time. 
+            Create instant coding sessions, share with candidates, and collaborate in real-time.
             No setup required.
           </p>
 
@@ -101,8 +113,8 @@ const Index = () => {
                   onChange={(e) => setName(e.target.value)}
                   className="bg-secondary border-border"
                 />
-                <Button 
-                  onClick={handleCreate} 
+                <Button
+                  onClick={handleCreate}
                   disabled={isCreating}
                   variant="glow"
                   size="lg"
@@ -130,7 +142,7 @@ const Index = () => {
                   onChange={(e) => setJoinCode(e.target.value)}
                   className="bg-secondary border-border font-mono"
                 />
-                <Button 
+                <Button
                   onClick={handleJoin}
                   disabled={isJoining}
                   variant="secondary"
@@ -154,7 +166,7 @@ const Index = () => {
                 See code changes instantly as candidates type. No refresh needed.
               </p>
             </div>
-            
+
             <div className="p-6 rounded-xl bg-card/50 border border-border/50 space-y-3">
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Zap className="w-6 h-6 text-primary" />
@@ -164,7 +176,7 @@ const Index = () => {
                 Run code directly in the browser with immediate feedback.
               </p>
             </div>
-            
+
             <div className="p-6 rounded-xl bg-card/50 border border-border/50 space-y-3">
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Shield className="w-6 h-6 text-primary" />

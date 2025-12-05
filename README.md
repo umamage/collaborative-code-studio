@@ -43,6 +43,8 @@ npm run dev
 - **Backend**: http://localhost:8000
 - **API Docs**: http://localhost:8000/docs
 
+> **Important**: In development mode, always access the application via the **frontend URL** (http://localhost:8080). The backend serves the API only. When deployed (Docker/Render), both frontend and backend are served from a single port.
+
 ### Docker Deployment
 
 To run the application in a Docker container:

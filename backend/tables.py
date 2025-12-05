@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, String, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship, DeclarativeBase
 from datetime import datetime
 import uuid
@@ -21,9 +21,6 @@ class Participant(Base):
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4())[:8])
     name = Column(String)
-    name = Column(String)
-    # isHost is boolean
-    from sqlalchemy import Boolean
     isHost = Column(Boolean, default=False)
     joined_at = Column(DateTime, default=datetime.utcnow)
     session_id = Column(String, ForeignKey("sessions.id"))
