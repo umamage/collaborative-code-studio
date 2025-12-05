@@ -35,7 +35,8 @@ const Index = () => {
     try {
       const session = await api.createSession(name.trim());
       toast.success('Session created!');
-      navigate(`/session/${session.id}`);
+      // Host goes directly to code editor, skipping join page
+      navigate(`/session/${session.id}/code`);
     } catch (error) {
       toast.error('Failed to create session');
     } finally {
@@ -58,7 +59,9 @@ const Index = () => {
       const session = await api.joinSession(joinCode.trim(), name.trim());
       if (session) {
         toast.success('Joined session!');
-        navigate(`/session/${session.id}`);
+        // Store participant info for verification
+        localStorage.setItem(`session_${joinCode.trim()}_participant`, name.trim());
+        navigate(`/session/${session.id}/code`);
       } else {
         toast.error('Session not found');
       }
