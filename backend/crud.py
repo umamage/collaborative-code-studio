@@ -34,8 +34,7 @@ async def create_session(db: AsyncSession, host_name: str, language: str = "java
     )
     
     db.add(db_session)
-    # Participant is added via relationship cascade or explicitly
-    # db.add(host_participant) # relationship handles this if we append, but here we set session=db_session
+    db.add(host_participant)
     
     await db.commit()
     await db.refresh(db_session)

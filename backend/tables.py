@@ -21,8 +21,8 @@ class Participant(Base):
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4())[:8])
     name = Column(String)
-    is_host = Column(String) # Storing boolean as string 'true'/'false' or just use Boolean if supported by all DBs easily. Let's use Boolean.
-    # Actually, let's use Boolean. SQLAlchemy handles it.
+    name = Column(String)
+    # isHost is boolean
     from sqlalchemy import Boolean
     isHost = Column(Boolean, default=False)
     joined_at = Column(DateTime, default=datetime.utcnow)

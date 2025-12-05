@@ -6,9 +6,17 @@ import crud
 
 router = APIRouter()
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 @router.post("/sessions", response_model=SessionModel, status_code=201)
 async def create_session(request: CreateSessionRequest, db: AsyncSession = Depends(get_db)):
-    return await crud.create_session(db, request.hostName, request.language)
+    try:
+        return await crud.create_session(db, request.hostName, request.language)
+    except Exception as e:
+        logger.error(f"Error creating session: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.get("/sessions/{session_id}", response_model=SessionModel)
 async def get_session(session_id: str, db: AsyncSession = Depends(get_db)):

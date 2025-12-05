@@ -45,18 +45,18 @@ def client():
 
 @pytest.fixture
 def session_id(client):
-    response = client.post("/sessions", json={"hostName": "Alice", "language": "python"})
+    response = client.post("/api/sessions", json={"hostName": "Alice", "language": "python"})
     assert response.status_code == 201
     return response.json()["id"]
 
 
 def test_read_root(client):
-    response = client.get("/")
+    response = client.get("/api")
     assert response.status_code == 200
     assert response.json() == {"message": "Collaborative Code Studio API is running"}
 
 def test_create_session(client):
-    response = client.post("/sessions", json={"hostName": "TestHost", "language": "python"})
+    response = client.post("/api/sessions", json={"hostName": "TestHost", "language": "python"})
     assert response.status_code == 201
     data = response.json()
     assert "id" in data
@@ -66,29 +66,29 @@ def test_create_session(client):
     assert data["participants"][0]["isHost"] == True
 
 def test_get_session(client, session_id):
-    response = client.get(f"/sessions/{session_id}")
+    response = client.get(f"/api/sessions/{session_id}")
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == session_id
 
 def test_get_nonexistent_session(client):
-    response = client.get("/sessions/nonexistent")
+    response = client.get("/api/sessions/nonexistent")
     assert response.status_code == 404
 
 def test_join_session(client, session_id):
-    response = client.post(f"/sessions/{session_id}/join", json={"participantName": "NewUser"})
+    response = client.post(f"/api/sessions/{session_id}/join", json={"participantName": "NewUser"})
     assert response.status_code == 200
     data = response.json()
     assert len(data["participants"]) == 2
     assert data["participants"][1]["name"] == "NewUser"
 
 def test_join_nonexistent_session(client):
-    response = client.post("/sessions/nonexistent/join", json={"participantName": "NewUser"})
+    response = client.post("/api/sessions/nonexistent/join", json={"participantName": "NewUser"})
     assert response.status_code == 404
 
 def test_update_code(client, session_id):
     new_code = "print('Updated Code')"
-    response = client.put(f"/sessions/{session_id}/code", json={
+    response = client.put(f"/api/sessions/{session_id}/code", json={
         "sessionId": session_id,
         "code": new_code,
         "language": "python",
@@ -97,12 +97,12 @@ def test_update_code(client, session_id):
     assert response.status_code == 200
     
     # Verify update
-    get_response = client.get(f"/sessions/{session_id}")
+    get_response = client.get(f"/api/sessions/{session_id}")
     assert get_response.json()["code"] == new_code
 
 def test_execute_code(client):
     code = "print('Hello')"
-    response = client.post("/execute", json={"code": code, "language": "python"})
+    response = client.post("/api/execute", json={"code": code, "language": "python"})
     assert response.status_code == 200
     data = response.json()
     assert data["success"] == True
